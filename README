@@ -4,6 +4,8 @@ This is Perl interface for communication with NeXpose scanner over API v1.1.
 You can start, stop, pause and resume scan. Watch progress and status of
 scan, download report, etc.
 
+Currently you can only start scan, list sites and delete site.
+
 INSTALLATION
 
 To install this module, run the following commands:

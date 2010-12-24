@@ -26,6 +26,8 @@ This is Perl interface for communication with NeXpose scanner over API v1.1.
 You can start, stop, pause and resume scan. Watch progress and status of
 scan, download report, etc.
 
+Currently you can only start scan, list sites and delete site.
+
     use Rapid7::NeXpose::API;
 
     my $n = Rapid7::NeXpose::API->new(
