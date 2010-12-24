@@ -250,6 +250,25 @@ sub sitescan {
 	}
 }
 
+=head2 sitedelete 
+
+delete site
+=cut
+sub sitedelete {
+	my ( $self, $siteid ) = @_;
+	my $hashref = { 'SiteDeleteRequest' => {
+	'sync-id' => $self->syncid(),
+	'session-id' => $self->session(),
+	'site-id' => $siteid
+	} };
+	my $xmlh = $self->xml_request($hashref);
+	if ($xmlh->{'SiteDeleteResponse'}->[0]->{'success'}==1) {
+		return 1;
+	} else { 
+		return 0;
+	}
+}
+
 =head2 DESTROY 
 destructor, calls logout method on destruction
 =cut
