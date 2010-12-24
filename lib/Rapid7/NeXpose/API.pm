@@ -47,7 +47,14 @@ If you think you have login problems, check this first!
 
 =head1 METHODS
 
-=head2 new
+=head2 new ( [key=>value, key2=>value2, ...] )
+
+creates new object Rapid7::NeXpose::API
+
+    my $n = Rapid7::NeXpose::API->new(
+                    url=>'https://localhost:3780', debug=>1, 
+                    user=>'user', password=>'test', nologin=>1
+            );
 
 =cut
 sub new {
