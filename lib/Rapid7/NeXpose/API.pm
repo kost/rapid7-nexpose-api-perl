@@ -163,7 +163,7 @@ sub http_api {
 	my ( $self, $post_data ) = @_;
 
 	my $ua = $self->{_ua};
-	my $r = POST $self->{_urlapi}, 'Content-Type'=>'text/xml', Content=>$post_data;
+	my $r = POST $self->urlapi(), 'Content-Type'=>'text/xml', Content=>$post_data;
 	my $result = $ua->request($r);
 	if ($result->is_success) {
 		return $result->content;
