@@ -7,11 +7,9 @@ use XML::Simple;
 use LWP::UserAgent;
 use HTTP::Request::Common;
 
-use Data::Dumper;
-
 =head1 NAME
 
-Rapid7::NeXpose::API - The great new Rapid7::NeXpose::API!
+Rapid7::NeXpose::API - Communicate with NeXpose via XML NeXpose API v1.1
 
 =head1 VERSION
 
@@ -24,40 +22,70 @@ our $VERSION = '0.01';
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
+This is Perl interface for communication with NeXpose scanner over API v1.1.
+You can start, stop, pause and resume scan. Watch progress and status of
+scan, download report, etc.
 
     use Rapid7::NeXpose::API;
 
-    my $foo = Rapid7::NeXpose::API->new();
-    ...
+    my $n = Rapid7::NeXpose::API->new(
+                    url=>'https://localhost:3780',password=>'test');
+    my $sl = $n->sitelist();
+    print "Starting scan for first site found: ";
+    printf "%s with ID: %s\n", $sl->[0]->{'name'}, $sl->[0]->{'id'};
+    $n->sitescan($sl->[0]->{'id'});
 
-=head1 EXPORT
+=head1 NOTICE
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+This CPAN module uses LWP for communicating with NeXpose over its API via https.
+Therefore, make sure that you have Net::SSL (provided by Crypt::SSLeay):
+http://search.cpan.org/perldoc?Crypt::SSLeay
+or IO::Socket::SSL:
+http://search.cpan.org/perldoc?IO::Socket::SSL
 
-=head1 SUBROUTINES/METHODS
+If you think you have login problems, check this first!
 
-=head2 function1
+=head1 METHODS
+
+=head2 new
 
 =cut
 sub new {
-	my $class = shift;
+	# Check for common user mistake - taken from LWP
+	Carp::croak("Options to Rapid7::NeXpose::API constructor should be key/value pairs, not hash reference")
+	if ref($_[1]) eq 'HASH';
+
+	my($class, %cnf) = @_;
 	my $self;
 
-	$self->{_url} = shift;
-#	$self->{_opts} = shift;
-#	$self->{_url} = $self->{_opts}->{url}
-	if ($self->{_url} eq '') {
+	$self->{_url} = delete $cnf{url}; 
+	if (!defined($self->{_url}) or $self->{_url} eq '') {
 		$self->{_url}='https://localhost:3780/';
 	} elsif (substr($self->{_url},-1,1) ne '/') {
 		$self->{_url}= $self->{_url}.'/';
 	}
-	$self->{_urlapi}=$self->{_url}."api/1.1/xml";
+
+	$self->{_urlapi} = delete $cnf{urlapi}; 
+	if (!defined($self->{_urlapi})) {
+		$self->{_urlapi}=$self->{_url}."api/1.1/xml";
+	}
+
+	$self->{_user} = delete $cnf{user}; 
+	$self->{_user} = "nxadmin" unless defined $self->{_user};
+
+	$self->{_password} = delete $cnf{password}; 
+
+	$self->{'_debug'} = 0 unless defined $cnf{'debug'};
+
 	$self->{_ua} = LWP::UserAgent->new;
+	if ($self->{'_debug'}) {
+		$self->lwpdebug();
+	}
+
 	bless $self, $class;
+	unless ($cnf{nologin} and !defined($self->{_password})) {
+		$self->login();
+	}
 	return $self;
 }
 
@@ -146,7 +174,10 @@ sub xml_request {
 	my ( $self, $req ) = @_;
 
 	my $xml = XMLout($req, RootName => '', XMLDecl => '<?xml version="1.0" encoding="UTF-8"?>');
-	print $xml."\n";
+	
+	if ($self->{'_debug'}>2) {
+		print STDERR $xml."\n";
+	} 
 	my $cont = $self->http_api ($xml);
 	my $xmls;
 	eval {
@@ -319,6 +350,10 @@ L<http://search.cpan.org/dist/Rapid7-NeXpose-API/>
 
 =back
 
+
+=head1 REPOSITORY
+
+Repository is available on GitHub: https://github.com/kost/rapid7-nexpose-api-perl
 
 =head1 ACKNOWLEDGEMENTS
 
