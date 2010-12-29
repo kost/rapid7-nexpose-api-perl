@@ -13,11 +13,11 @@ Rapid7::NeXpose::API - Communicate with NeXpose via XML NeXpose API v1.1
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS
@@ -123,9 +123,8 @@ sub urlapi {
 set NeXpose credentials, returns $user
 =cut
 sub user {
-	my ( $self, $user, $password ) = @_;
+	my ( $self, $user ) = @_;
 	$self->{_user} = $user if defined($user);
-	$self->{_password} = $password if defined($password);
 	return ( $self->{_user} );
 }
 
