@@ -10,6 +10,13 @@ WriteMakefile(
     ($ExtUtils::MakeMaker::VERSION >= 6.3002
       ? ('LICENSE'=> 'perl')
       : ()),
+    ($ExtUtils::MakeMaker::VERSION < 6.46 ? () : (
+	META_MERGE          => {
+		resources => {
+		bugtracker  =>      'https://rt.cpan.org/Public/Bug/Report.html?Queue=Rapid7-NeXpose-API',
+		repository  =>      'https://github.com/kost/rapid7-nexpose-api-perl'
+		}
+	})),
     PL_FILES            => {},
     PREREQ_PM => {
         'Test::More' => 0,
